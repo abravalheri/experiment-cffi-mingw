@@ -40,6 +40,8 @@ jobs:
           echo "$(which pip) -- $(pip -VV)"
           python -c 'import os, sys; print(os.name, sys.platform, getattr(sys, "abiflags", None))'
           python -c 'import importlib.machinery as im; print(im.all_suffixes())'
+          python -c 'import _distutils_hack; print(f"{_distutils_hack.enabled()=}")'
+          python -c 'import distutils; print(distutils)'
           python -m pip -V
           python -m pip list
       - name: Test
