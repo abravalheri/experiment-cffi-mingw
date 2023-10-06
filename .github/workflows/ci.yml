@@ -9,37 +9,37 @@ concurrency:
 jobs:
   test-mingw:
     runs-on: windows-latest
-    name:  mingw-${{ matrix.arch }}-cffi-${{ matrix.cffi_version }}
+    name: mingw-${{ matrix.arch }} - ${{ matrix.cffi }}
     strategy:
       fail-fast: false
       matrix:
-        cffi_version: ["1.15.1", "1.16.0"]
-        include: [
-          { msystem: MINGW64, arch: x86_64, path: mingw64, rust_target: x86_64-pc-windows-gnu },
-          { msystem: MINGW32, arch: i686, path: mingw32, rust_target: i686-pc-windows-gnu }
-        ]
+        cffi: ["cffi<1.16", "cffi>=1.16.0"]
+        arch: ["i686", "x86_64"]
     steps:
       - uses: actions/checkout@v3
       - name: Install MSys2 and dependencies
         uses: msys2/setup-msys2@v2
         with:
           update: true
-          msystem: ${{ matrix.msystem }}
+          msystem: ${{ matrix.arch == 'x86_64' && 'MINGW64' || 'MINGW32' }}
           install: >-
             git
             mingw-w64-${{ matrix.arch }}-python
             mingw-w64-${{ matrix.arch }}-python-pip
             mingw-w64-${{ matrix.arch }}-openssl
             mingw-w64-${{ matrix.arch }}-toolchain
-      - name: Install dependencies
+      - name: Debug Info
         shell: msys2 {0}
         run: |
-          python -m pip install -U pip
-          echo "------ DEBUG INFO ------"
+          python -m pip install -U pip setuptools wheel
           echo "$(which python) -- $(python -VV)"
           echo "$(which pip) -- $(pip -VV)"
           python -c 'import os, sys; print(os.name, sys.platform, getattr(sys, "abiflags", None))'
+          python -c 'import importlib.machinery as im; print(im.all_suffixes())'
           python -m pip -V
           python -m pip list
-          echo "------ TEST ------"
-          python -m pip install -U "cffi==${{ matrix.cffi_version}}"
+      - name: Test
+        shell: msys2 {0}
+        run: |
+          python -m pip install -U "${{ matrix.cffi}}"
+          python -m pip list
