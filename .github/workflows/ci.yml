@@ -15,7 +15,7 @@ jobs:
       matrix:
         cffi: ["cffi<1.16", "cffi>=1.16.0"]
         arch: ["i686", "x86_64"]
-        distutils: ["stdlib", "local"]
+        distutils: ["local", "stdlib"]
     steps:
       - uses: actions/checkout@v3
       - name: Install MSys2 and dependencies
@@ -35,6 +35,7 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: ${{ matrix.distutils }}
         run: |
           python -m pip install -U pip setuptools wheel
+          echo $SETUPTOOLS_USE_DISTUTILS
           echo "$(which python) -- $(python -VV)"
           echo "$(which pip) -- $(pip -VV)"
           python -c 'import os, sys; print(os.name, sys.platform, getattr(sys, "abiflags", None))'
