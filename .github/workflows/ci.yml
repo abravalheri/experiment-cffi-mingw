@@ -45,5 +45,5 @@ jobs:
       - name: Test
         shell: msys2 {0}
         run: |
-          python -m pip -vv install -U "${{ matrix.cffi}}"
+          python -m pip -v install -U "${{ matrix.cffi}}"
           python -m pip list
