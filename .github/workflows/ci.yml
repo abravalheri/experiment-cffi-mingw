@@ -9,12 +9,13 @@ concurrency:
 jobs:
   test-mingw:
     runs-on: windows-latest
-    name: mingw-${{ matrix.arch }} - ${{ matrix.cffi }}
+    name: mingw-${{ matrix.arch }} - ${{ matrix.cffi }} - ${{ matrix.distutils}} distutils
     strategy:
       fail-fast: false
       matrix:
         cffi: ["cffi<1.16", "cffi>=1.16.0"]
         arch: ["i686", "x86_64"]
+        distutils: ["stdlib", "local"]
     steps:
       - uses: actions/checkout@v3
       - name: Install MSys2 and dependencies
@@ -30,6 +31,8 @@ jobs:
             mingw-w64-${{ matrix.arch }}-toolchain
       - name: Debug Info
         shell: msys2 {0}
+        env:
+          SETUPTOOLS_USE_DISTUTILS: ${{ matrix.distutils }}
         run: |
           python -m pip install -U pip setuptools wheel
           echo "$(which python) -- $(python -VV)"
